@@ -39,6 +39,7 @@ public:
 	void eq11();
 	void update_root_tail(size_t e);
 	int get_max_l_p_q() const;
+	void print() const;
 
 	bool operator < (const JobShopNode& rhs) const
 	{

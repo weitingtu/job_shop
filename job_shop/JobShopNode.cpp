@@ -36,12 +36,19 @@ JobShopNode JobShopNode::create_initial_node()
 	node._arcs.insert(std::make_pair(ArcFromTo(0, 1), Arc(0, M)));
 	node._arcs.insert(std::make_pair(ArcFromTo(0, 2), Arc(6, M)));
 	node._arcs.insert(std::make_pair(ArcFromTo(0, 3), Arc(10, M)));
-	node._arcs.insert(std::make_pair(ArcFromTo(1, 2), Arc(2, 16)));
-	node._arcs.insert(std::make_pair(ArcFromTo(1, 3), Arc(1, 38)));
-	node._arcs.insert(std::make_pair(ArcFromTo(2, 1), Arc(3, 18)));
-	node._arcs.insert(std::make_pair(ArcFromTo(2, 3), Arc(3, 28)));
-	node._arcs.insert(std::make_pair(ArcFromTo(3, 1), Arc(3, 28)));
-	node._arcs.insert(std::make_pair(ArcFromTo(3, 2), Arc(4, 20)));
+	//node._arcs.insert(std::make_pair(ArcFromTo(1, 2), Arc(2, 16)));
+	//node._arcs.insert(std::make_pair(ArcFromTo(1, 3), Arc(1, 38)));
+	//node._arcs.insert(std::make_pair(ArcFromTo(2, 1), Arc(3, 18)));
+	//node._arcs.insert(std::make_pair(ArcFromTo(2, 3), Arc(3, 28)));
+	//node._arcs.insert(std::make_pair(ArcFromTo(3, 1), Arc(3, 28)));
+	//node._arcs.insert(std::make_pair(ArcFromTo(3, 2), Arc(4, 20)));
+
+	node._arcs.insert(std::make_pair(ArcFromTo(1, 2), Arc(0, 16)));
+	node._arcs.insert(std::make_pair(ArcFromTo(1, 3), Arc(0, 38)));
+	node._arcs.insert(std::make_pair(ArcFromTo(2, 1), Arc(0, 18)));
+	node._arcs.insert(std::make_pair(ArcFromTo(2, 3), Arc(0, 28)));
+	node._arcs.insert(std::make_pair(ArcFromTo(3, 1), Arc(0, 28)));
+	node._arcs.insert(std::make_pair(ArcFromTo(3, 2), Arc(0, 20)));
 
 	_initialize_C(node);
 
@@ -334,6 +341,19 @@ int JobShopNode::get_max_l_p_q() const
 	return UB2;
 }
 
+void JobShopNode::print() const
+{
+	for (size_t i : _IS)
+	{
+		printf("%zu ", i);
+	}
+	for (size_t i : _OS)
+	{
+		printf("%zu ", i);
+	}
+	printf("\n");
+}
+
 void JobShopNode::calculate_LB()
 {
 	_LB = _proposition_1();
@@ -491,18 +511,18 @@ bool JobShopNode::is_feasible(const std::vector<size_t>& seq, int& C_max) const
 
 int JobShopNode::get_H(const std::set<size_t>& C) const
 {
-	int r = M;
-	int q = M;
+	int min_r = M;
+	int min_q = M;
 	int sum_p = 0;
 	for (size_t i : C)
 	{
 		const Job& job = _jobs.at(i);
-		r = std::min(r, job.r);
-		q = std::min(q, job.q);
+		min_r = std::min(min_r, job.r);
+		min_q = std::min(min_q, job.q);
 		sum_p += job.p;
 	}
 
-	return r + sum_p + q;
+	return min_r + sum_p + min_q;
 }
 
 int JobShopNode::get_LB(const std::set<size_t>& C) const

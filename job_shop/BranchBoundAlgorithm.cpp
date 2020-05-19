@@ -1,27 +1,35 @@
 #include "BranchBoundAlgorithm.h"
 #include "type.h"
 
+// algorithm 2.
 void BranchBoundAlgorithm::run(JobShopNode root)
 {
 	int UB = M;
 	JobShopNode best = root;
 	root.calculate_LB();
 
+	int count = 0;
 	_queue.push(root);
+	// Step 3.
 	while (!_queue.empty())
 	{
+		printf("Algorithm 2. Step 1. Select node count %d\n", ++count);
 		// Step 1. Selection of a node with the lowest lower bound
 		JobShopNode node = _queue.top();
 		_queue.pop();
 
 		_run(node, best, UB);
 	}
+
+	printf("UB = %d\n", UB);
+	best.print();
 }
 
 void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 {
 	// skip 1.1
     // 1.2
+	printf("Algorithm 2. step 1.2 C size %zu\n", node.C().size());
 	if (node.C().size() > 2)
 	{
 		// get E and S by proposition 4, 5, 8 and 9
@@ -133,6 +141,7 @@ void BranchBoundAlgorithm::_branching_process(const JobShopNode& alpha, int UB)
 
 void BranchBoundAlgorithm::_branching_process(JobShopNode beta, size_t e, size_t s, int UB)
 {
+	// step 1
 	// step 2
 	beta.add_input(e);
 	beta.add_output(s);
@@ -178,6 +187,8 @@ void BranchBoundAlgorithm::_branching_process(JobShopNode beta, size_t e, size_t
 
 void BranchBoundAlgorithm::_update_best(const JobShopNode& node, JobShopNode& best, int& UB) const
 {
+	printf("Algorithm 2. step 2. update best\n");
+	// algorithm 2.
 	// step 2
 	int C_max = 0;
 	if (!node.is_feasible(C_max))
