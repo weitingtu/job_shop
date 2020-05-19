@@ -39,10 +39,12 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 		{
 			// remove node
 			// go to step 3
+			printf("%s %d, E or S is empty, remove node, go to step 3\n", __func__, __LINE__);
 			return;
 		}
 		else 
 		{
+			printf("step 1.3\n");
 			// go step 1.3
 			// Removal of input and output jobs which satisfy Proposition 13.
 			std::vector<size_t> to_erase;
@@ -76,6 +78,7 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 			{
 			    // remove node
 			    // go to step 3
+			    printf("%s %d, remove node, go to step 3\n", __func__, __LINE__);
 				return;
 			}
 			// go to step 1.4
@@ -112,6 +115,7 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 	}
 	// 1.3
 	// 1.4
+	printf("step 1.4\n");
 	_branching_process(node, UB);
 	// 1.5
 	if (node.C().empty())
