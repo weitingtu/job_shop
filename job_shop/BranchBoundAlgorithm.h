@@ -20,3 +20,11 @@ private:
 	std::priority_queue<JobShopNode, std::vector<JobShopNode>, std::less<JobShopNode> > _queue;
 };
 
+class Permutation
+{
+public:
+	void run(const JobShopNode& root) const;
+	int get_first_C_max(const JobShopNode& root, std::vector<size_t>& seq) const;
+	int get_max_C_max(const JobShopNode& root, std::vector<size_t>& seq) const;
+	int get_min_C_max(const JobShopNode& root, std::vector<size_t>& seq) const;
+};

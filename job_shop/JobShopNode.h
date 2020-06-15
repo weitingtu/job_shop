@@ -13,8 +13,10 @@ public:
 		return inst;
 	}
 	static JobShopNode create_initial_node();
+	static JobShopNode create_random_node(size_t J);
 public:
 	JobShopNode();
+
 	void calculate_LB();
 	int get_LB() const { return _LB; }
 	void get_E(int UB);
@@ -22,11 +24,13 @@ public:
 	bool is_proposition_3(size_t k);
 	bool is_proposition_11(size_t e, size_t s, int UB);
 	bool is_feasible(int& C_max) const;
+	bool is_feasible(const std::vector<size_t>& seq, int& C_max) const;
 	const std::set<size_t>& C() const { return _C; }
 	const std::set<size_t>& E() const { return _E; }
 	const std::set<size_t>& S() const { return _S; }
 	void erase_E(size_t e);
 	void erase_S(size_t s);
+	void clear_E_S() { _E.clear(); _S.clear(); }
 	bool is_root() const { return _root;  }
 	void set_not_root() { _root = false; }
 	void add_input(size_t e);
@@ -39,7 +43,11 @@ public:
 	void eq11();
 	void update_root_tail(size_t e);
 	int get_max_l_p_q() const;
+	size_t get_job_size() const { return _jobs.size(); }
+	void set_seq(const std::vector<size_t>& seq);
+
 	void print() const;
+	void print_internal() const;
 
 	bool operator < (const JobShopNode& rhs) const
 	{
@@ -59,6 +67,7 @@ private:
 		int l;
 		int u;
 	};
+
 	struct ArcFromTo
 	{
 		ArcFromTo(size_t f, size_t t) : from(f), to(t) {}
@@ -81,7 +90,6 @@ private:
 	int get_H(const std::set<size_t>& C) const;
 	int get_LB(const std::set<size_t>& C) const;
 	int get_LB_ATSP(const std::set<size_t>& C) const;
-	bool is_feasible(const std::vector<size_t>& seq, int& C_max) const;
 	int _proposition_1() const;
 	bool is_proposition_4_input(size_t k) const;
 	bool is_proposition_4_output(size_t ryy) const;
