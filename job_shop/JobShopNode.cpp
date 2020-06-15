@@ -624,9 +624,10 @@ bool JobShopNode::is_feasible(const std::vector<size_t>& seq, int& C_max) const
 	    int l = job.r;
 	    int u = job.r;
 		C_max = l + job.p + job.q;
-		ll.push_back(l + job.p);
-		uu.push_back(u + job.p);
-		//printf("j %zu l = %d u = %d C max = %d = l %d + p %d + q %d\n", 1, l, u, C_max, l, job.p, job.q);
+		//ll.push_back(l + job.p);
+		//uu.push_back(u + job.p);
+		ll.push_back(l);
+		uu.push_back(u);
 	}
 	for (size_t j = 2; j < seq.size(); ++j)
 	{
@@ -644,7 +645,6 @@ bool JobShopNode::is_feasible(const std::vector<size_t>& seq, int& C_max) const
 			}
 			const Arc& arc = get_arc(job_i.idx, job_j.idx);
 			l = std::max(l, ll[i] + job_i.p + arc.W1);
-			//printf("l = %d = ll %d + p %d + W1 %d\n", l, ll[i], job_i.p,  arc.W1);
 			if (uu[i] == M || job_i.p == M || arc.W2 == M)
 			{
 				continue;
@@ -660,6 +660,101 @@ bool JobShopNode::is_feasible(const std::vector<size_t>& seq, int& C_max) const
 		C_max = std::max(C_max, l + job_j.p + job_j.q);
 		//printf("j %zu l = %d u = %d C max = %d = l %d + p %d + q %d\n", j, l, u, C_max, l, job_j.p, job_j.q);
 		// update W*?
+	}
+	return true;
+}
+
+bool JobShopNode::is_feasible(size_t batch, const std::vector<size_t>& seq, int& C_max) const
+{
+	if (seq.empty())
+	{
+		return false;
+	}
+
+	if (seq.size() <= 1)
+	{
+		return false;
+	}
+
+	C_max = 0;
+	std::vector<int> ll;
+	std::vector<int> uu;
+	// job 0, S 
+	{
+	    int l = 0;
+	    int u = 0;
+		ll.push_back(l);
+		uu.push_back(u);
+	}
+	// job 1
+	int prev_l = 0;
+	int prev_u = 0;
+	std::set<size_t> prev;
+	{
+		prev.clear();
+		int r = 0;
+		int q = 0;
+		int p = 0;
+		for (size_t j = 1; j < batch && j < seq.size() - 1; ++j)
+		{
+        	prev.insert(seq.at(j));
+	        const Job& job = _jobs.at(seq.at(j));
+			r = std::max(r, job.r);
+			q = std::max(q, job.q);
+			p = std::max(p, job.p);
+		}
+		int l = r + p;
+		int u = r + p;
+		//C_max = l + p + q;
+		C_max = l + q;
+		prev_l = l;
+		prev_u = u;
+	}
+	for (size_t i = 1 + batch; i < seq.size() - 1 - batch; i += batch)
+	{
+		int W1 = 0;
+		int W2 = M;
+		for (size_t p : prev)
+		{
+			const Job& job_i = _jobs.at(seq.at(p));
+			for (size_t j = i; j < batch && j < seq.size() - 1; ++j)
+			{
+				const Job& job_j = _jobs.at(seq.at(j));
+				if (!has_arc(job_i.idx, job_j.idx))
+				{
+					printf("error, there is no arc between (%zu, %zu)\n", i, j);
+					return false;
+				}
+				const Arc& arc = get_arc(job_i.idx, job_j.idx);
+				W1 = std::max(W1, arc.W1);
+				W2 = std::min(W2, arc.W2);
+			}
+		}
+
+		int r = 0;
+		int q = 0;
+		int p = 0;
+	    for (size_t j = i; j < batch && j < seq.size() - 1; ++j)
+		{
+	        const Job& job = _jobs.at(seq.at(j));
+			r = std::max(r, job.r);
+			q = std::max(q, job.q);
+			p = std::max(p, job.p);
+		}
+
+		int l = prev_l + p + W1;
+		int u = prev_u + p + W2;
+		prev_l = l;
+		prev_u = u;
+
+		//C_max = std::max(C_max, l + p + q);
+		C_max = std::max(C_max, l + q);
+
+		prev.clear();
+		for (size_t j = i; j < batch; ++j)
+		{
+			prev.insert(seq.at(j));
+		}
 	}
 	return true;
 }

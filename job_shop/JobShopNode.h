@@ -25,6 +25,7 @@ public:
 	bool is_proposition_11(size_t e, size_t s, int UB);
 	bool is_feasible(int& C_max) const;
 	bool is_feasible(const std::vector<size_t>& seq, int& C_max) const;
+	bool is_feasible(size_t batch, const std::vector<size_t>& seq, int& C_max) const;
 	const std::set<size_t>& C() const { return _C; }
 	const std::set<size_t>& E() const { return _E; }
 	const std::set<size_t>& S() const { return _S; }

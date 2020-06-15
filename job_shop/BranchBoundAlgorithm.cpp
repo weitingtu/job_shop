@@ -20,7 +20,7 @@ void _printf(const char* format, ...)
 }
 
 // algorithm 2.
-void BranchBoundAlgorithm::run(JobShopNode root)
+void BranchBoundAlgorithm::run(JobShopNode root, int& total_node)
 {
 	JobShopNode best = root;
 	int UB = M;
@@ -46,6 +46,7 @@ void BranchBoundAlgorithm::run(JobShopNode root)
 	}
 
 	//printf("UB = %d, total run node %d\n", UB, count);
+	total_node = count;
 	printf("total run node %d\n", count);
 	
 	//int C_max = M;
@@ -411,7 +412,7 @@ int Permutation::get_max_C_max(const JobShopNode& root, std::vector<size_t>& seq
 	return C_max;
 }
 
-int Permutation::get_min_C_max(const JobShopNode& root, std::vector<size_t>& seq) const
+int Permutation::get_min_C_max(const JobShopNode& root, std::vector<size_t>& seq, int& total_node) const
 {
 	size_t size = root.get_job_size();
 	seq.clear();
@@ -434,6 +435,7 @@ int Permutation::get_min_C_max(const JobShopNode& root, std::vector<size_t>& seq
 		}
 	} while (std::next_permutation(seq.begin() + 1, seq.end() - 1));
 
+	total_node = count;
 	printf("total run node = %d\n", count);
 	//printf("C max = %d\n", C_max);
 	seq = seq_max;

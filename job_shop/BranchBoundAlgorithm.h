@@ -8,7 +8,7 @@ class BranchBoundAlgorithm
 public:
 	BranchBoundAlgorithm() : _queue() {}
 
-	void run(JobShopNode root);
+	void run(JobShopNode root, int& total_node);
 private:
 	void _run(JobShopNode node, JobShopNode& best, int& UB);
 	void _branching_process(const JobShopNode& alpha, int UB);
@@ -26,5 +26,5 @@ public:
 	void run(const JobShopNode& root) const;
 	int get_first_C_max(const JobShopNode& root, std::vector<size_t>& seq) const;
 	int get_max_C_max(const JobShopNode& root, std::vector<size_t>& seq) const;
-	int get_min_C_max(const JobShopNode& root, std::vector<size_t>& seq) const;
+	int get_min_C_max(const JobShopNode& root, std::vector<size_t>& seq, int& total_node) const;
 };
