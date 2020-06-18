@@ -57,7 +57,7 @@ int main()
 				C_max = C;
 			}
 			total_node2 += total_node;
-			total_C_max = std::max(total_C_max, C_max);
+			total_C_max += C_max;
 			//for (size_t i = 0; i < seq.size(); ++i)
 			//{
 				//printf("%zu ", seq.at(i));
