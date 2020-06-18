@@ -9,7 +9,8 @@ int main()
 	//JobShopNode root = JobShopNode::create_initial_node();
 	size_t Machine = 5;
 	size_t J = 10;
-	size_t Batch = 2;
+	size_t BatchSize = 2;
+	size_t BatchMachine = 2;
 	printf("Machine %zu Job %zu\n", Machine, J);
 	__int64 run_time1 = 0;
 	__int64 run_time2 = 0;
@@ -18,9 +19,9 @@ int main()
 	int total_C_max = 0;
 	for (size_t i = 0; i < Machine; ++i)
 	{
-		if (i == 0)
+		if (i < BatchMachine)
 		{
-		    printf("Machine %zu (batch size %zu)\n", i, Batch);
+		    printf("Machine %zu (batch size %zu)\n", i, BatchSize);
 		}
 		else
 		{
@@ -49,10 +50,10 @@ int main()
 			std::vector<size_t> seq;
 			int total_node = 0;
 			int C_max = pp.get_min_C_max(root, seq, total_node);
-			if (i == 0)
+			if (i < BatchMachine)
 			{
 				int C;
-				root.is_feasible(Batch, seq, C);
+				root.is_feasible(BatchSize, seq, C);
 				C_max = C;
 			}
 			total_node2 += total_node;
