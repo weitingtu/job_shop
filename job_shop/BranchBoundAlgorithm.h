@@ -6,7 +6,7 @@
 class BranchBoundAlgorithm
 {
 public:
-	BranchBoundAlgorithm() : _queue() {}
+	BranchBoundAlgorithm() : _queue(), _removed_node(0) {}
 
 	void run(JobShopNode root, int& total_node);
 private:
@@ -18,6 +18,7 @@ private:
 	int _fix_output(const JobShopNode& node, size_t s) const;
 
 	std::priority_queue<JobShopNode, std::vector<JobShopNode>, std::less<JobShopNode> > _queue;
+	int _removed_node;
 };
 
 class Permutation

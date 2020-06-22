@@ -2,6 +2,7 @@
 #include "type.h"
 #include <limits.h>
 #include <algorithm>
+#include <numeric>
 
 JobShopNode::Job::Job(size_t i, int rr, int pp, int qq) : 
 	idx(i), 
@@ -120,6 +121,96 @@ JobShopNode JobShopNode::create_random_node(size_t J)
 	return node;
 }
 
+JobShopNode JobShopNode::create_batch_node(const JobShopNode& batch, const std::vector<size_t>& seq, size_t batch_size, std::vector<size_t>& result_seq)
+{
+	JobShopNode node;
+	node._root = true;
+	std::vector<std::vector<size_t>> batch_seq;
+
+	batch_seq.push_back(std::vector<size_t>(1, seq.front()));
+	for (size_t i = 1; i < seq.size() - 1; i += batch_size)
+	{
+		batch_seq.push_back(std::vector<size_t>());
+		for (size_t j = i; j < i + batch_size && j < seq.size() - 1; ++j)
+		{
+			batch_seq.back().push_back(seq.at(j));
+		}
+	}
+	batch_seq.push_back(std::vector<size_t>(1, seq.back()));
+
+	//for (size_t i = 0; i < seq.size(); ++i)
+	//{
+	//	printf("%zu ", seq.at(i));
+	//}
+	//printf("\n");
+	//for (size_t i = 0; i < batch_seq.size(); ++i)
+	//{
+	//	printf("{ ");
+	//	for (size_t j = 0; j < batch_seq.at(i).size(); ++j)
+	//	{
+	//		printf("%zu ", batch_seq.at(i).at(j));
+	//	}
+	//	printf("}");
+	//}
+	//printf("\n");
+
+	for (size_t i = 0; i < batch_seq.size(); ++i)
+	{
+		int r = 0;
+		int p = 0;
+		int q = 0;
+		for (size_t j = 0; j < batch_seq.at(i).size(); ++j)
+		{
+			const Job& job = batch._jobs.at(j);
+			r = std::max(r, job.r);
+			p = std::max(p, job.p);
+			q = std::max(q, job.q);
+		}
+	    node._jobs.push_back(Job(i,  r,  p,  q)); 
+	}
+
+	for (size_t i = 1; i < batch_seq.size() - 1; ++i)
+	{
+		const Job& job = node._jobs.at(i);
+	    node._arcs.insert(std::make_pair(ArcFromTo(0, i),     Arc(0, job.r)));
+	    node._arcs.insert(std::make_pair(ArcFromTo(i, batch_seq.size() - 1), Arc(0, job.q)));
+	}
+	node._arcs.insert(std::make_pair(ArcFromTo(0, batch_seq.size() - 1), Arc(0, 0)));
+
+	for (size_t i = 1; i < batch_seq.size() - 1; ++i)
+	{
+	    for (size_t j = 1; j < batch_seq.size() - 1; ++j)
+    	{
+			if (i == j)
+			{
+				continue;
+			}
+			int M1 = 0;
+			int M2 = M;
+			for (size_t ii = 0; ii < batch_seq.at(i).size(); ++ii)
+			{
+		        const Job& job_i = batch._jobs.at(batch_seq.at(i).at(ii));
+				for (size_t jj = 0; jj < batch_seq.at(j).size(); ++jj)
+				{
+		            const Job& job_j = batch._jobs.at(batch_seq.at(j).at(jj));
+                   if (!batch.has_arc(job_i.idx, job_j.idx))
+		           {
+			           printf("error, there is no arc between (%zu, %zu)\n", job_i.idx, job_j.idx);
+			           continue;
+		           }
+		           const Arc& arc = batch.get_arc(job_i.idx, job_j.idx);
+				   M2 = std::min(M2, arc.W2);
+				}
+			}
+	        node._arcs.insert(std::make_pair(ArcFromTo(i, j), Arc(M1, M2)));
+    	}
+	}
+
+	result_seq.resize(batch_seq.size());
+	std::iota(result_seq.begin(), result_seq.end(), 0);
+	return node;
+}
+
 JobShopNode::JobShopNode():
 	_LB(M),
 	_root(true),
@@ -131,6 +222,32 @@ JobShopNode::JobShopNode():
 	_jobs(),
 	_arcs()
 {
+}
+
+int JobShopNode::get_omega() const
+{
+	int omega = M;
+	for (size_t i = 1; i < _jobs.size() - 1; ++i)
+	{
+		const Job& job = _jobs.at(i);
+		omega = std::min(omega, job.l + job.p );
+	}
+
+	return omega;
+}
+
+int JobShopNode::get_omega(size_t batch_size) const
+{
+	int l = 0;
+	int sum_p = 0;
+	for (size_t i = 1; i < _jobs.size() - 1; ++i)
+	{
+		const Job& job = _jobs.at(i);
+		l = std::max(l, job.l);
+		sum_p += job.p;
+	}
+
+	return l + (int)((double) sum_p / batch_size);
 }
 
 void JobShopNode::erase_E(size_t e)

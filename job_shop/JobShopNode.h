@@ -14,9 +14,12 @@ public:
 	}
 	static JobShopNode create_initial_node();
 	static JobShopNode create_random_node(size_t J);
+	static JobShopNode create_batch_node(const JobShopNode& batch, const std::vector<size_t>& seq, size_t batch_size, std::vector<size_t>& result_seq);
 public:
 	JobShopNode();
 
+	int get_omega() const;
+	int get_omega(size_t batch_size) const;
 	void calculate_LB();
 	int get_LB() const { return _LB; }
 	void get_E(int UB);
