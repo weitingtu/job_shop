@@ -49,6 +49,11 @@ void BranchBoundAlgorithm::run(JobShopNode root, int& total_node)
 	total_node = count;
 	printf("total run node %d\n", count);
 	printf("removed node   %d\n", _removed_node);
+	printf("removed node   %d (algorithm 2 step 1.2 E or S empty)\n", _removed_node1);
+	printf("removed node   %d (algorithm 2 step 1.3 E or S empty)\n", _removed_node2);
+	printf("removed node   %d (algorithm 3 (branching) eq 6 and 7)\n", _removed_node3);
+	printf("removed node   %d (algorithm 3 (branching) proposition 3)\n", _removed_node4);
+	printf("removed node   %d (algorithm 3 (branching) LB1 or LB2 > UB)\n", _removed_node5);
 	
 	//int C_max = M;
 	//if (!best.is_feasible(C_max))
@@ -76,6 +81,7 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 			// go to step 3
 			//printf("%s %d, E or S is empty, remove node, go to step 3\n", __func__, __LINE__);
 			++_removed_node;
+			++_removed_node1;
 			return;
 		}
 		else 
@@ -120,6 +126,7 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 			    // go to step 3
 			    _printf("%s %d, remove node, go to step 3\n", __func__, __LINE__);
 			    ++_removed_node;
+			    ++_removed_node2;
 				return;
 			}
 			// go to step 1.4
@@ -219,6 +226,7 @@ void BranchBoundAlgorithm::_branching_process(JobShopNode beta, size_t e, size_t
 	{
 		// if ls > us, remove node beta
 		++_removed_node;
+		++_removed_node3;
 		return;
 	}
 
@@ -227,6 +235,7 @@ void BranchBoundAlgorithm::_branching_process(JobShopNode beta, size_t e, size_t
 	{
 		// remove node beta
 		++_removed_node;
+		++_removed_node4;
 		return;
 	}
 
@@ -249,6 +258,7 @@ void BranchBoundAlgorithm::_branching_process(JobShopNode beta, size_t e, size_t
 	{
 		// remove node beta
 		++_removed_node;
+		++_removed_node5;
 		return;
 	}
 

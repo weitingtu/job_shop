@@ -6,7 +6,15 @@
 class BranchBoundAlgorithm
 {
 public:
-	BranchBoundAlgorithm() : _queue(), _removed_node(0) {}
+	BranchBoundAlgorithm() : 
+		_queue(), 
+		_removed_node(0),
+		_removed_node1(0),
+		_removed_node2(0),
+		_removed_node3(0),
+		_removed_node4(0),
+		_removed_node5(0)
+	{}
 
 	void run(JobShopNode root, int& total_node);
 private:
@@ -19,6 +27,11 @@ private:
 
 	std::priority_queue<JobShopNode, std::vector<JobShopNode>, std::less<JobShopNode> > _queue;
 	int _removed_node;
+	int _removed_node1;
+	int _removed_node2;
+	int _removed_node3;
+	int _removed_node4;
+	int _removed_node5;
 };
 
 class Permutation
