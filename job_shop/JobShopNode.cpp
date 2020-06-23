@@ -86,9 +86,9 @@ JobShopNode JobShopNode::create_random_node(size_t J)
 		}
 		else
 		{
-			int r = get_random_rum(0, 10);
-			int p = get_random_rum(0, 10);
-			int q = get_random_rum(0, 10);
+			int r = get_random_rum( 0, 5);
+			int p = get_random_rum(15, 30);
+			int q = get_random_rum( 0, 5);
 
 	        node._jobs.push_back(Job(i,  r,  p,  q)); 
 		}
@@ -227,11 +227,21 @@ JobShopNode::JobShopNode():
 int JobShopNode::get_omega() const
 {
 	int omega = M;
+	//int l = 0;
+	//int p = 0;
 	for (size_t i = 1; i < _jobs.size() - 1; ++i)
 	{
 		const Job& job = _jobs.at(i);
+		//if (job.l + job.p < omega)
+		//{
+		//	omega = job.l + job.p;
+		//	l = job.l;
+		//	p = job.p;
+		//}
 		omega = std::min(omega, job.l + job.p );
 	}
+
+	//printf("omega %d = %d + %d\n", omega, l, p);
 
 	return omega;
 }
@@ -247,7 +257,14 @@ int JobShopNode::get_omega(size_t batch_size) const
 		sum_p += job.p;
 	}
 
-	return l + (int)((double) sum_p / batch_size);
+	//printf("batch omega %d = %d + %d (%d/%zu/%zu)\n", 
+ //   	l + (int)((double) sum_p / batch_size / (_jobs.size() - 2)),
+	//	l, 
+	//	(int)((double) sum_p/batch_size/(_jobs.size() - 2)), 
+	//	sum_p, 
+	//	batch_size,
+	//	(_jobs.size() - 2));
+	return l + (int)((double) sum_p / batch_size / (_jobs.size() - 2));
 }
 
 void JobShopNode::erase_E(size_t e)
