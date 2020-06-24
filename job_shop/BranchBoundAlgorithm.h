@@ -16,7 +16,7 @@ public:
 		_removed_node5(0)
 	{}
 
-	void run(JobShopNode root, int& total_node);
+	void run(JobShopNode root, int& total_node, int& C_max);
 private:
 	void _run(JobShopNode node, JobShopNode& best, int& UB);
 	void _branching_process(const JobShopNode& alpha, int UB);

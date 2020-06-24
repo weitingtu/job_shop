@@ -20,7 +20,7 @@ void _printf(const char* format, ...)
 }
 
 // algorithm 2.
-void BranchBoundAlgorithm::run(JobShopNode root, int& total_node)
+void BranchBoundAlgorithm::run(JobShopNode root, int& total_node, int& C_max)
 {
 	JobShopNode best = root;
 	int UB = M;
@@ -55,12 +55,12 @@ void BranchBoundAlgorithm::run(JobShopNode root, int& total_node)
 	printf("removed node   %d (algorithm 3 (branching) proposition 3)\n", _removed_node4);
 	printf("removed node   %d (algorithm 3 (branching) LB1 or LB2 > UB)\n", _removed_node5);
 	
-	//int C_max = M;
-	//if (!best.is_feasible(C_max))
-	//{
+	C_max = M;
+	if (!best.is_feasible(C_max))
+	{
 	//	printf("%s %d, error best is not feasible\n", __func__, __LINE__);
 	//	return;
-	//}
+	}
 	//printf("C max = %d\n", C_max);
 	//best.print();
 }

@@ -10,6 +10,7 @@ int main()
 	size_t J = 10;
 	size_t BatchSize = 2;
 	size_t BatchMachine = 2;
+	bool run_exhaustive = true;
 	printf("Machine %zu Job %zu\n", Machine, J);
 
 	std::vector<JobShopNode> roots;
@@ -49,18 +50,25 @@ int main()
 		    printf("Machine %zu\n", i);
 		}
 		JobShopNode root = roots.at(i);
+		int C_max = 0;
 		{
 			std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 			printf("Run Algorithm\n");
 			int total_node = 0;
+			int C = 0;
 			BranchBoundAlgorithm bb;
-			bb.run(root, total_node);
+			bb.run(root, total_node, C);
 			total_node1 += total_node;
 
+			if (!run_exhaustive)
+			{
+				C_max = C;
+			}
 			std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 			run_time1 += std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count();
 		}
+		if(run_exhaustive)
 		{
 			std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -68,7 +76,7 @@ int main()
 			Permutation pp;
 			std::vector<size_t> seq;
 			int total_node = 0;
-			int C_max = pp.get_min_C_max(root, seq, total_node);
+			C_max = pp.get_min_C_max(root, seq, total_node);
 			if (i < BatchMachine)
 			{
 				int C;
@@ -81,12 +89,12 @@ int main()
 				C_max = C;
 			}
 			total_node2 += total_node;
-			total_C_max += C_max;
 			std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 			run_time2 += std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count();
 
-	        printf("C max = %d\n", C_max);
 		}
+		total_C_max += C_max;
+	    printf("C max = %d\n", C_max);
 	}
 
 	printf("Run Algorithm\n");
