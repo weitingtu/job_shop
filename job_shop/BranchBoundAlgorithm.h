@@ -11,6 +11,8 @@ public:
 		_removed_node(0),
 		_removed_node1(0),
 		_removed_node2(0),
+		_removed_node2_fix_input(0),
+		_removed_node2_fix_output(0),
 		_removed_node3(0),
 		_removed_node4(0),
 		_removed_node5(0)
@@ -29,6 +31,8 @@ private:
 	int _removed_node;
 	int _removed_node1;
 	int _removed_node2;
+	int _removed_node2_fix_input;
+	int _removed_node2_fix_output;
 	int _removed_node3;
 	int _removed_node4;
 	int _removed_node5;

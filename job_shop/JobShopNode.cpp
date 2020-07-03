@@ -86,9 +86,12 @@ JobShopNode JobShopNode::create_random_node(size_t J)
 		}
 		else
 		{
-			int r = get_random_rum( 0, 5);
-			int p = get_random_rum(15, 30);
-			int q = get_random_rum( 0, 5);
+			//int r = get_random_rum( 0, 5);
+			//int p = get_random_rum(15, 30);
+			//int q = get_random_rum( 0, 5);
+			int r = get_random_rum( 0, 10);
+			int p = get_random_rum( 0, 10);
+			int q = get_random_rum( 0, 10);
 
 	        node._jobs.push_back(Job(i,  r,  p,  q)); 
 		}
@@ -604,7 +607,6 @@ void JobShopNode::calculate_LB()
 
 void JobShopNode::get_E(int UB)
 {
-	//printf("%s %d C size %zu UB %d\n", __func__, __LINE__, _C.size(), UB);
 	_E.clear();
 	// proposition 4, 5, 8 and 9
 	for (size_t k : _C)
@@ -612,21 +614,17 @@ void JobShopNode::get_E(int UB)
 		bool add = false;
 		if (is_proposition_7(k, UB))
 		{
-			//printf("job %zu satisfy proposition 7\n", k);
 		    if (is_proposition_4_input(k))
 	    	{
-			    //printf("job %zu satisfy proposition 4 input\n", k);
 				add = true;
 		    }
         }
 		if (!add && !is_proposition_5_a(k, UB))
 		{
-			//printf("job %zu satisfy proposition 5 input\n", k);
 			add = true;
 		}
 		if (add)
 		{
-			//printf("%s %d, add job %zu satisfy into E\n", __func__, __LINE__, k);
 			_E.insert(k);
 		}
 	}
@@ -634,7 +632,6 @@ void JobShopNode::get_E(int UB)
 
 void JobShopNode::get_S(int UB)
 {
-	//printf("%s %d C size %zu UB %d\n", __func__, __LINE__, _C.size(), UB);
 	_S.clear();
 	// proposition 4, 5, 8 and 9
 	for (size_t r : _C)
@@ -642,21 +639,17 @@ void JobShopNode::get_S(int UB)
 		bool add = false;
 		if (is_proposition_7(r, UB))
 		{
-			//printf("job %zu satisfy proposition 7\n", r);
 		    if (is_proposition_4_output(r))
     		{
-			    //printf("job %zu satisfy proposition 4 output\n", r);
 	    		add = true;
 		    }
         }
 		if (!add && !is_proposition_5_b(r, UB))
 		{
-			//printf("job %zu satisfy proposition 5 output\n", r);
 			add = true;
 		}
 		if (add)
 		{
-			//printf("%s %d, add job %zu satisfy into S\n", __func__, __LINE__, r);
 			_S.insert(r);
 		}
 	}
