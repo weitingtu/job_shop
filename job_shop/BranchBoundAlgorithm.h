@@ -15,7 +15,8 @@ public:
 		_removed_node2_fix_output(0),
 		_removed_node3(0),
 		_removed_node4(0),
-		_removed_node5(0)
+		_removed_node5(0),
+		_removed_node6(0)
 	{}
 
 	void run(JobShopNode root, int& total_node, int& C_max);
@@ -23,7 +24,7 @@ private:
 	void _run(JobShopNode node, JobShopNode& best, int& UB);
 	void _branching_process(const JobShopNode& alpha, int UB);
 	void _branching_process(JobShopNode beta, size_t e, size_t s, int UB);
-	void _update_best(const JobShopNode& node, JobShopNode& best, int& UB) const;
+	void _update_best(const JobShopNode& node, JobShopNode& best, int& UB);
 	int _fix_input(const JobShopNode& node, size_t e) const;
 	int _fix_output(const JobShopNode& node, size_t s) const;
 
@@ -36,6 +37,7 @@ private:
 	int _removed_node3;
 	int _removed_node4;
 	int _removed_node5;
+	int _removed_node6;
 };
 
 class Permutation

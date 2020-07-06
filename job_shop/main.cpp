@@ -13,6 +13,7 @@ int main()
 	bool run_exhaustive = true;
 	printf("Machine %zu Job %zu\n", Machine, J);
 
+	// create random nodes
 	std::vector<JobShopNode> roots;
 	std::vector<std::pair<int, size_t>> omega_idx;
 	for (size_t i = 0; i < Machine; ++i)
@@ -30,6 +31,7 @@ int main()
 		omega_idx.push_back(std::make_pair(omega, i));
 	}
 
+	// sort random nodes by omega
 	std::sort(omega_idx.begin(), omega_idx.end());
 
 	__int64 run_time1 = 0;
@@ -41,6 +43,7 @@ int main()
 	{
 		size_t i = omega_idx.at(ii).second;
 
+		// first i machines are batch machine
 		if (i < BatchMachine)
 		{
 		    printf("Machine %zu (batch size %zu)\n", i, BatchSize);
@@ -79,10 +82,8 @@ int main()
 			C_max = pp.get_min_C_max(root, seq, total_node);
 			if (i < BatchMachine)
 			{
+				// get c max for batch machine
 				int C;
-				//root.is_feasible(BatchSize, seq, C);
-				//C_max = C;
-
 			    std::vector<size_t> batch_seq;
 				JobShopNode batch_node = JobShopNode::create_batch_node(root, seq, BatchSize, batch_seq);
 				batch_node.is_feasible(batch_seq, C);

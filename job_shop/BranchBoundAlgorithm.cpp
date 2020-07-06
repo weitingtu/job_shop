@@ -6,6 +6,7 @@
 
 static bool print_step = false;
 
+// debug print
 void _printf(const char* format, ...)
 {
 	if (!print_step)
@@ -22,9 +23,11 @@ void _printf(const char* format, ...)
 // algorithm 2.
 void BranchBoundAlgorithm::run(JobShopNode root, int& total_node, int& C_max)
 {
+	// Step 0. Initialization
 	JobShopNode best = root;
 	int UB = M;
 	{
+		// get initial solution
 		Permutation pp;
 		std::vector<size_t> seq;
 		UB = pp.get_first_C_max(root, seq);
@@ -53,6 +56,7 @@ void BranchBoundAlgorithm::run(JobShopNode root, int& total_node, int& C_max)
 	printf("removed node   %d (algorithm 2 step 1.3 E or S empty, propositoin 13)\n", _removed_node2);
 	printf("removed node     %d (algorithm 2 step 1.3 E or S empty: fix input eq 4, 5, 8, 9, 10, 11 prop 1)\n", _removed_node2_fix_input);
 	printf("removed node     %d (algorithm 2 step 1.3 E or S empty: fix output eq 6, 7, 8, 9, 11 prop 1)\n", _removed_node2_fix_output);
+	printf("removed node   %d (algorithm 2 step 2 infeasibility (algorithm 1) or UB > C max\n", _removed_node6);
 	printf("removed node   %d (algorithm 3 (branching) eq 6 and 7)\n", _removed_node3);
 	printf("removed node   %d (algorithm 3 (branching) proposition 3)\n", _removed_node4);
 	printf("removed node   %d (algorithm 3 (branching) LB1 or LB2 > UB, proposition 12)\n", _removed_node5);
@@ -63,13 +67,11 @@ void BranchBoundAlgorithm::run(JobShopNode root, int& total_node, int& C_max)
 	//	printf("%s %d, error best is not feasible\n", __func__, __LINE__);
 	//	return;
 	}
-	//printf("C max = %d\n", C_max);
-	//best.print();
 }
 
 void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 {
-	// skip 1.1
+	// skip 1.1, already initialized in step 0
     // 1.2
 	_printf("Algorithm 2. step 1.2 C size %zu\n", node.C().size());
 	if (node.C().size() > 2)
@@ -147,6 +149,7 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 		{
 			// go to step 2
 			JobShopNode beta = node;
+			// jobs are already assigned into input/output in is_proposition_11 function
 	        //beta.add_input(i);
 	        //beta.add_output(j);
 	        _update_best(beta, best, UB);
@@ -156,6 +159,7 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 		{
 			// go to step 2
 			JobShopNode beta = node;
+			// jobs are already assigned into input/output in is_proposition_11 function
 	        //beta.add_input(j);
 	        //beta.add_output(i);
 	        _update_best(beta, best, UB);
@@ -214,6 +218,7 @@ void BranchBoundAlgorithm::_branching_process(const JobShopNode& alpha, int UB)
 			{
 				continue;
 			}
+			// for each pair of e,s
 			_branching_process(alpha, e, s, UB);
 		}
 	}
@@ -272,26 +277,24 @@ void BranchBoundAlgorithm::_branching_process(JobShopNode beta, size_t e, size_t
 	_queue.push(beta);
 }
 
-void BranchBoundAlgorithm::_update_best(const JobShopNode& node, JobShopNode& best, int& UB) const
+void BranchBoundAlgorithm::_update_best(const JobShopNode& node, JobShopNode& best, int& UB) 
 {
 	_printf("Algorithm 2. step 2. update best\n");
 	// algorithm 2.
-	// step 2
+	// Step 2
 	int C_max = 0;
 	if (!node.is_feasible(C_max))
 	{
+		++_removed_node;
+		++_removed_node6;
 		return;
 	}
 	if (UB <= C_max)
 	{
+		++_removed_node;
+		++_removed_node6;
 		return;
 	}
-	//printf("update best from %d -> %d\n", UB, C_max);
-	//best.print();
-	//best.print_internal();
-
-	//node.print();
-	//node.print_internal();
 
 	best = node;
 	UB = C_max;
@@ -369,17 +372,10 @@ void Permutation::run(const JobShopNode& root) const
 	int C_max = M;
 	do {
 		int C = 0;
-		//for (size_t i : seq)
-		//{
-		//	printf("%zu ", i);
-		//}
-		//printf("\n");
-
 		if (!root.is_feasible(seq, C))
 		{
 			continue;
 		}
-		//printf("feasible!\n");
 		if (C < C_max)
 		{
 			C_max = C;
@@ -390,6 +386,7 @@ void Permutation::run(const JobShopNode& root) const
 
 int Permutation::get_first_C_max(const JobShopNode& root, std::vector<size_t>& seq) const
 {
+	// get first feasible solution from permutation
 	size_t size = root.get_job_size();
 	seq.clear();
 	seq.resize(size);
@@ -405,12 +402,12 @@ int Permutation::get_first_C_max(const JobShopNode& root, std::vector<size_t>& s
 		break;
 	} while (std::next_permutation(seq.begin() + 1, seq.end() - 1));
 
-	//printf("C max = %d\n", C_max);
 	return C_max;
 }
 
 int Permutation::get_max_C_max(const JobShopNode& root, std::vector<size_t>& seq) const
 {
+	// get max C max feasible solution from permutation
 	size_t size = root.get_job_size();
 	seq.clear();
 	seq.resize(size);
@@ -437,6 +434,7 @@ int Permutation::get_max_C_max(const JobShopNode& root, std::vector<size_t>& seq
 
 int Permutation::get_min_C_max(const JobShopNode& root, std::vector<size_t>& seq, int& total_node) const
 {
+	// get min C max feasible solution from permutation
 	size_t size = root.get_job_size();
 	seq.clear();
 	seq.resize(size);
@@ -460,7 +458,6 @@ int Permutation::get_min_C_max(const JobShopNode& root, std::vector<size_t>& seq
 
 	total_node = count;
 	printf("total run node = %d\n", count);
-	//printf("C max = %d\n", C_max);
 	seq = seq_max;
 	return C_max;
 }

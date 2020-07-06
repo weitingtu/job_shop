@@ -23,6 +23,7 @@ void JobShopNode::_initialize_C(JobShopNode& node)
 	}
 }
 
+// create example node from paper
 JobShopNode JobShopNode::create_initial_node()
 {
 	JobShopNode node;
@@ -34,18 +35,9 @@ JobShopNode JobShopNode::create_initial_node()
 	node._jobs.push_back(Job(3, 10,  4,  0));
 	node._jobs.push_back(Job(4,  0,  0,  0)); // T
 
-	//node._arcs.insert(std::make_pair(ArcFromTo(0, 1), Arc(0, M)));
-	//node._arcs.insert(std::make_pair(ArcFromTo(0, 2), Arc(6, M)));
-	//node._arcs.insert(std::make_pair(ArcFromTo(0, 3), Arc(10, M)));
 	node._arcs.insert(std::make_pair(ArcFromTo(0, 1), Arc(0, 0)));
 	node._arcs.insert(std::make_pair(ArcFromTo(0, 2), Arc(6, 6)));
 	node._arcs.insert(std::make_pair(ArcFromTo(0, 3), Arc(10, 10)));
-	//node._arcs.insert(std::make_pair(ArcFromTo(1, 2), Arc(2, 16)));
-	//node._arcs.insert(std::make_pair(ArcFromTo(1, 3), Arc(1, 38)));
-	//node._arcs.insert(std::make_pair(ArcFromTo(2, 1), Arc(3, 18)));
-	//node._arcs.insert(std::make_pair(ArcFromTo(2, 3), Arc(3, 28)));
-	//node._arcs.insert(std::make_pair(ArcFromTo(3, 1), Arc(3, 28)));
-	//node._arcs.insert(std::make_pair(ArcFromTo(3, 2), Arc(4, 20)));
 
 	node._arcs.insert(std::make_pair(ArcFromTo(1, 2), Arc(0, 16)));
 	node._arcs.insert(std::make_pair(ArcFromTo(1, 3), Arc(0, 38)));
@@ -72,6 +64,8 @@ static int get_random_rum(int low, int up)
 	return (int)r;
 }
 
+
+// create random node
 JobShopNode JobShopNode::create_random_node(size_t J)
 {
 	JobShopNode node;
@@ -126,6 +120,7 @@ JobShopNode JobShopNode::create_random_node(size_t J)
 
 JobShopNode JobShopNode::create_batch_node(const JobShopNode& batch, const std::vector<size_t>& seq, size_t batch_size, std::vector<size_t>& result_seq)
 {
+	// jobs are group by batch size
 	JobShopNode node;
 	node._root = true;
 	std::vector<std::vector<size_t>> batch_seq;
@@ -141,22 +136,7 @@ JobShopNode JobShopNode::create_batch_node(const JobShopNode& batch, const std::
 	}
 	batch_seq.push_back(std::vector<size_t>(1, seq.back()));
 
-	//for (size_t i = 0; i < seq.size(); ++i)
-	//{
-	//	printf("%zu ", seq.at(i));
-	//}
-	//printf("\n");
-	//for (size_t i = 0; i < batch_seq.size(); ++i)
-	//{
-	//	printf("{ ");
-	//	for (size_t j = 0; j < batch_seq.at(i).size(); ++j)
-	//	{
-	//		printf("%zu ", batch_seq.at(i).at(j));
-	//	}
-	//	printf("}");
-	//}
-	//printf("\n");
-
+	// update batch job time
 	for (size_t i = 0; i < batch_seq.size(); ++i)
 	{
 		int r = 0;
@@ -172,6 +152,8 @@ JobShopNode JobShopNode::create_batch_node(const JobShopNode& batch, const std::
 	    node._jobs.push_back(Job(i,  r,  p,  q)); 
 	}
 
+	// add arc from start point to batch job
+	// add arc from batch job to end point
 	for (size_t i = 1; i < batch_seq.size() - 1; ++i)
 	{
 		const Job& job = node._jobs.at(i);
@@ -227,28 +209,21 @@ JobShopNode::JobShopNode():
 {
 }
 
+
+// get single machine omega
 int JobShopNode::get_omega() const
 {
 	int omega = M;
-	//int l = 0;
-	//int p = 0;
 	for (size_t i = 1; i < _jobs.size() - 1; ++i)
 	{
 		const Job& job = _jobs.at(i);
-		//if (job.l + job.p < omega)
-		//{
-		//	omega = job.l + job.p;
-		//	l = job.l;
-		//	p = job.p;
-		//}
 		omega = std::min(omega, job.l + job.p );
 	}
-
-	//printf("omega %d = %d + %d\n", omega, l, p);
 
 	return omega;
 }
 
+// get batch machine omega
 int JobShopNode::get_omega(size_t batch_size) const
 {
 	int l = 0;
@@ -259,14 +234,6 @@ int JobShopNode::get_omega(size_t batch_size) const
 		l = std::max(l, job.l);
 		sum_p += job.p;
 	}
-
-	//printf("batch omega %d = %d + %d (%d/%zu/%zu)\n", 
- //   	l + (int)((double) sum_p / batch_size / (_jobs.size() - 2)),
-	//	l, 
-	//	(int)((double) sum_p/batch_size/(_jobs.size() - 2)), 
-	//	sum_p, 
-	//	batch_size,
-	//	(_jobs.size() - 2));
 	return l + (int)((double) sum_p / batch_size / (_jobs.size() - 2));
 }
 
@@ -479,13 +446,8 @@ void JobShopNode::eq10_and_11(size_t e)
 
 void JobShopNode::eq11()
 {
-	// disable update q
+	// disable eq 11
 	return;
-	//if (is_root())
-	//{
-	//	printf("error, %s is root\n", __func__);
-	//	return;
-	//}
 	int ll = 0;
 	if (!_OS.empty())
 	{
@@ -723,6 +685,7 @@ bool JobShopNode::is_feasible(int& C_max) const
 	return is_feasible(seq, C_max);
 }
 
+// algorithm 1.
 bool JobShopNode::is_feasible(const std::vector<size_t>& seq, int& C_max) const
 {
 	if (seq.empty())
@@ -735,6 +698,7 @@ bool JobShopNode::is_feasible(const std::vector<size_t>& seq, int& C_max) const
 		return false;
 	}
 
+	// before Step 0.
 	C_max = 0;
 	std::vector<int> ll;
 	std::vector<int> uu;
@@ -745,23 +709,23 @@ bool JobShopNode::is_feasible(const std::vector<size_t>& seq, int& C_max) const
 		ll.push_back(l);
 		uu.push_back(u);
 	}
+	// Step 0.
 	// job 1
     {
 	    const Job& job = _jobs.at(seq.at(1));
 	    int l = job.r;
 	    int u = job.r;
 		C_max = l + job.p + job.q;
-		//ll.push_back(l + job.p);
-		//uu.push_back(u + job.p);
 		ll.push_back(l);
 		uu.push_back(u);
 	}
+	// Step 1.
 	for (size_t j = 2; j < seq.size(); ++j)
 	{
+		// 1.1
 		const Job& job_j = _jobs.at(seq.at(j));
 		int l = 0;
 		int u = M;
-		//for (size_t i = 0; i < j; ++i)
 		for (size_t i = j - 1; i < j; ++i)
 		{
 		    const Job& job_i = _jobs.at(seq.at(i));
@@ -778,15 +742,15 @@ bool JobShopNode::is_feasible(const std::vector<size_t>& seq, int& C_max) const
 			}
 			u = std::min(u, uu[i] + job_i.p + arc.W2);
 		}
+		// 1.2
 		if (l > u)
 		{
+			// sequence is infeasible
 			return false;
 		}
 		ll.push_back(l);
 		uu.push_back(u);
 		C_max = std::max(C_max, l + job_j.p + job_j.q);
-		//printf("j %zu l = %d u = %d C max = %d = l %d + p %d + q %d\n", j, l, u, C_max, l, job_j.p, job_j.q);
-		// update W*?
 	}
 	return true;
 }
@@ -886,6 +850,7 @@ bool JobShopNode::is_feasible(size_t batch, const std::vector<size_t>& seq, int&
 	return true;
 }
 
+// check proposition 1 for H, LB, LB ATSP
 int JobShopNode::get_H(const std::set<size_t>& C) const
 {
 	int min_r = M;
@@ -917,13 +882,11 @@ int JobShopNode::get_LB_ATSP(const std::set<size_t>& C) const
 
 int JobShopNode::_proposition_1() const
 {
-	//printf("%s %d %zu\n", __func__, __LINE__, _C.size());
 	return get_LB(_C);
 }
 
 bool JobShopNode::is_proposition_4_input(size_t k) const
 {
-	//printf("k = %zu\n", k );
 	const Job& job_k = _jobs.at(k);
 	for (size_t r : _C)
 	{
@@ -933,7 +896,6 @@ bool JobShopNode::is_proposition_4_input(size_t k) const
 		{
 			continue;
 		}
-		//printf("r = %zu\n", r);
 		if (job_r.r == M)
 		{
 			continue;
@@ -945,7 +907,6 @@ bool JobShopNode::is_proposition_4_input(size_t k) const
 		}
 
 		const Arc& arc = get_arc(k, r);
-		//printf("%s %d l %d p %d W1 %d W2 %d, u %d l %d\n", __func__, __LINE__, job_k.l, job_k.p, arc.W1, arc.W2, job_r.u, job_r.l);
 		if (job_k.l + job_k.p + arc.W1 > job_r.u)
 		{
 			return false;
@@ -961,7 +922,6 @@ bool JobShopNode::is_proposition_4_input(size_t k) const
 
 bool JobShopNode::is_proposition_4_output(size_t r) const
 {
-	//printf("r = %zu\n", r);
 	const Job& job_r = _jobs.at(r);
 	for (size_t k : _C)
 	{
@@ -971,7 +931,6 @@ bool JobShopNode::is_proposition_4_output(size_t r) const
 		{
 			continue;
 		}
-		//printf("k = %zu\n", k);
 		if (job_k.r == M)
 		{
 			continue;
@@ -983,7 +942,6 @@ bool JobShopNode::is_proposition_4_output(size_t r) const
 		}
 
 		const Arc& arc = get_arc(k, r);
-		//printf("%s %d l %d p %d W1 %d W2 %d, u %d l %d\n", __func__, __LINE__, job_k.l, job_k.p, arc.W1, arc.W2, job_r.u, job_r.l);
 		if (job_k.l + job_k.p + arc.W1 > job_r.u)
 		{
 			return false;
@@ -1009,7 +967,6 @@ bool JobShopNode::is_proposition_5_a(size_t k, int UB) const
 			continue;
 		}
 		const Job& job = _jobs.at(i);
-		//r = std::min(r, job.r);
 		q = std::min(q, job.q);
 		sum_p += job.p;
 	}
@@ -1030,7 +987,6 @@ bool JobShopNode::is_proposition_5_b(size_t idx_r, int UB) const
 		}
 		const Job& job = _jobs.at(i);
 		r = std::min(r, job.r);
-		//q = std::min(q, job.q);
 		sum_p += job.p;
 	}
 
@@ -1042,7 +998,6 @@ bool JobShopNode::is_proposition_7(size_t k, int UB) const
 	std::set<size_t> C = _C;;
 	C.erase(k);
 	int H = get_H(C);
-	//printf("H = %d, %d\n", H, _jobs.at(k).p);
 
 	return H + _jobs.at(k).p > UB;
 }
