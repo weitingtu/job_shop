@@ -18,6 +18,7 @@ public:
 public:
 	JobShopNode();
 
+	int get_permutation_count() const;
 	int get_omega() const;
 	int get_omega(size_t batch_size) const;
 	void calculate_LB();

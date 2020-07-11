@@ -210,6 +210,17 @@ JobShopNode::JobShopNode():
 }
 
 
+int JobShopNode::get_permutation_count() const
+{
+	int count = 1;
+	for(size_t i = 1; i <= _C.size(); ++i)
+	{
+		count *= i;
+	}
+
+	return count;
+}
+
 // get single machine omega
 int JobShopNode::get_omega() const
 {

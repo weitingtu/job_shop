@@ -51,15 +51,15 @@ void BranchBoundAlgorithm::run(JobShopNode root, int& total_node, int& C_max)
 	//printf("UB = %d, total run node %d\n", UB, count);
 	total_node = count;
 	printf("total run node %d\n", count);
-	printf("removed node   %d\n", _removed_node);
-	printf("removed node   %d (algorithm 2 step 1.2 E or S empty, proposition 4, 5, 8, 9)\n", _removed_node1);
-	printf("removed node   %d (algorithm 2 step 1.3 E or S empty, propositoin 13)\n", _removed_node2);
-	printf("removed node     %d (algorithm 2 step 1.3 E or S empty: fix input eq 4, 5, 8, 9, 10, 11 prop 1)\n", _removed_node2_fix_input);
-	printf("removed node     %d (algorithm 2 step 1.3 E or S empty: fix output eq 6, 7, 8, 9, 11 prop 1)\n", _removed_node2_fix_output);
-	printf("removed node   %d (algorithm 2 step 2 infeasibility (algorithm 1) or UB > C max\n", _removed_node6);
-	printf("removed node   %d (algorithm 3 (branching) eq 6 and 7)\n", _removed_node3);
-	printf("removed node   %d (algorithm 3 (branching) proposition 3)\n", _removed_node4);
-	printf("removed node   %d (algorithm 3 (branching) LB1 or LB2 > UB, proposition 12)\n", _removed_node5);
+	printf("removed node   %d(%d)\n", _removed_node, _w_removed_node);
+	printf("removed node   %d(%d) (algorithm 2 step 1.2 E or S empty, proposition 4, 5, 8, 9)\n", _removed_node1, _w_removed_node1);
+	printf("removed node   %d(%d) (algorithm 2 step 1.3 E or S empty, propositoin 13)\n", _removed_node2, _w_removed_node2);
+	printf("removed node     %d(%d) (algorithm 2 step 1.3 E or S empty: fix input eq 4, 5, 8, 9, 10, 11 prop 1)\n", _removed_node2_fix_input, _w_removed_node2_fix_input);
+	printf("removed node     %d(%d) (algorithm 2 step 1.3 E or S empty: fix output eq 6, 7, 8, 9, 11 prop 1)\n", _removed_node2_fix_output, _w_removed_node2_fix_output);
+	printf("removed node   %d(%d) (algorithm 2 step 2 infeasibility (algorithm 1) or UB > C max\n", _removed_node6, _w_removed_node6);
+	printf("removed node   %d(%d) (algorithm 3 (branching) eq 6 and 7)\n", _removed_node3, _w_removed_node3);
+	printf("removed node   %d(%d) (algorithm 3 (branching) proposition 3)\n", _removed_node4, _w_removed_node4);
+	printf("removed node   %d(%d) (algorithm 3 (branching) LB1 or LB2 > UB, proposition 12)\n", _removed_node5, _w_removed_node5);
 	
 	C_max = M;
 	if (!best.is_feasible(C_max))
@@ -86,6 +86,8 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 			//printf("%s %d, E or S is empty, remove node, go to step 3\n", __func__, __LINE__);
 			++_removed_node;
 			++_removed_node1;
+			_w_removed_node += node.get_permutation_count();
+			_w_removed_node1 += node.get_permutation_count();
 			return;
 		}
 		else 
@@ -127,13 +129,17 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 			    _printf("%s %d, remove node, go to step 3\n", __func__, __LINE__);
 			    ++_removed_node;
 			    ++_removed_node2;
+			    _w_removed_node += node.get_permutation_count();
+			    _w_removed_node2 += node.get_permutation_count();
 				if (node.E().empty())
 				{
     			    ++_removed_node2_fix_input;
+    			    _w_removed_node2_fix_input += node.get_permutation_count();
 				}
 				if (node.S().empty())
 				{
     			    ++_removed_node2_fix_output;
+    			    ++_w_removed_node2_fix_output += node.get_permutation_count();
 				}
 				return;
 			}
@@ -238,6 +244,8 @@ void BranchBoundAlgorithm::_branching_process(JobShopNode beta, size_t e, size_t
 		// if ls > us, remove node beta
 		++_removed_node;
 		++_removed_node3;
+		_w_removed_node += beta.get_permutation_count();
+		_w_removed_node3 += beta.get_permutation_count();
 		return;
 	}
 
@@ -247,6 +255,8 @@ void BranchBoundAlgorithm::_branching_process(JobShopNode beta, size_t e, size_t
 		// remove node beta
 		++_removed_node;
 		++_removed_node4;
+		_w_removed_node += beta.get_permutation_count();
+		_w_removed_node4 += beta.get_permutation_count();
 		return;
 	}
 
@@ -270,6 +280,8 @@ void BranchBoundAlgorithm::_branching_process(JobShopNode beta, size_t e, size_t
 		// remove node beta
 		++_removed_node;
 		++_removed_node5;
+		_w_removed_node += beta.get_permutation_count();
+		_w_removed_node5 += beta.get_permutation_count();
 		return;
 	}
 
@@ -287,12 +299,16 @@ void BranchBoundAlgorithm::_update_best(const JobShopNode& node, JobShopNode& be
 	{
 		++_removed_node;
 		++_removed_node6;
+		_w_removed_node += node.get_permutation_count();
+		_w_removed_node6 += node.get_permutation_count();
 		return;
 	}
 	if (UB <= C_max)
 	{
 		++_removed_node;
 		++_removed_node6;
+		_w_removed_node += node.get_permutation_count();
+		_w_removed_node6 += node.get_permutation_count();
 		return;
 	}
 
