@@ -52,6 +52,7 @@ void BranchBoundAlgorithm::run(JobShopNode root, int& total_node, int& C_max)
 	total_node = count;
 	printf("total run node %d\n", count);
 	printf("removed node   %d(%d)\n", _removed_node, _w_removed_node);
+	printf("removed node   %d(%d) (algorithm 2 step 1.2 E or S reduce, proposition 4, 5, 8, 9)\n", _removed_node7, _w_removed_node7);
 	printf("removed node   %d(%d) (algorithm 2 step 1.2 E or S empty, proposition 4, 5, 8, 9)\n", _removed_node1, _w_removed_node1);
 	printf("removed node   %d(%d) (algorithm 2 step 1.3 E or S empty, propositoin 13)\n", _removed_node2, _w_removed_node2);
 	printf("removed node     %d(%d) (algorithm 2 step 1.3 E or S empty: fix input eq 4, 5, 8, 9, 10, 11 prop 1)\n", _removed_node2_fix_input, _w_removed_node2_fix_input);
@@ -79,6 +80,49 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 		// get E and S by proposition 4, 5, 8 and 9
 		node.get_E(UB);
 		node.get_S(UB);
+		if (!node.E().empty() && !node.S().empty())
+		{
+			size_t size_all = 0;
+			size_t size_alg = 0;
+			{
+				std::set<std::pair<size_t, size_t>> set;
+				for (size_t i : node.C())
+				{
+					for (size_t j : node.C())
+					{
+						if (i == j)
+						{
+							continue;
+						}
+						set.insert(std::make_pair(i, j));
+					}
+				}
+				size_all = set.size();
+			}
+            {
+				std::set<std::pair<size_t, size_t>> set;
+				for (size_t i : node.E())
+				{
+					for (size_t j : node.S())
+					{
+						if (i == j)
+						{
+							continue;
+						}
+						set.insert(std::make_pair(i, j));
+					}
+				}
+				size_alg = set.size();
+			}
+			if (size_alg > size_all)
+			{
+				printf("%s %d, error %zu > %zu\n", __func__, __LINE__, size_alg, size_all);
+			}
+			_removed_node += size_all - size_alg;
+			_removed_node7 += size_all - size_alg;
+			_w_removed_node += (size_all - size_alg) * node.get_permutation_count(2);
+			_w_removed_node7 += (size_all - size_alg) * node.get_permutation_count(2);
+		}
 		if(node.E().empty() || node.S().empty())
 		{
 			// remove node

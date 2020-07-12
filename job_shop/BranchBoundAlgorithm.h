@@ -17,6 +17,7 @@ public:
 		_removed_node4(0),
 		_removed_node5(0),
 		_removed_node6(0),
+		_removed_node7(0),
 		_w_removed_node(0),
 		_w_removed_node1(0),
 		_w_removed_node2(0),
@@ -25,7 +26,8 @@ public:
 		_w_removed_node3(0),
 		_w_removed_node4(0),
 		_w_removed_node5(0),
-		_w_removed_node6(0)
+		_w_removed_node6(0),
+		_w_removed_node7(0)
 	{}
 
 	void run(JobShopNode root, int& total_node, int& C_max);
@@ -47,6 +49,7 @@ private:
 	int _removed_node4;
 	int _removed_node5;
 	int _removed_node6;
+	int _removed_node7;
 	int _w_removed_node;
 	int _w_removed_node1;
 	int _w_removed_node2;
@@ -56,6 +59,7 @@ private:
 	int _w_removed_node4;
 	int _w_removed_node5;
 	int _w_removed_node6;
+	int _w_removed_node7;
 };
 
 class Permutation
