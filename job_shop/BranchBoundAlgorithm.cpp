@@ -40,6 +40,10 @@ void BranchBoundAlgorithm::run(JobShopNode root, int& total_node, int& C_max)
 	// Step 3.
 	while (!_queue.empty())
 	{
+		if (count > 0 && count % 10000 == 0)
+		{
+			printf("  Run %d nodes...\n", count);
+		}
 		_printf("Algorithm 2. Step 1. Select node count %d\n", ++count);
 		// Step 1. Selection of a node with the lowest lower bound
 		JobShopNode node = _queue.top();
@@ -503,6 +507,10 @@ int Permutation::get_min_C_max(const JobShopNode& root, std::vector<size_t>& seq
 	std::vector<size_t> seq_max;
 	int count = 0;
 	do {
+		if (count > 0 && count % 10000 == 0)
+		{
+			printf("  Run %d nodes...\n", count);
+		}
 		++count;
 		int C;
 		if (!root.is_feasible(seq, C))
