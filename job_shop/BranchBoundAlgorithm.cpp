@@ -3,6 +3,7 @@
 #include <numeric>
 #include <algorithm>
 #include <stdarg.h>
+#include <iterator>
 
 static bool print_step = false;
 
@@ -57,6 +58,14 @@ void BranchBoundAlgorithm::run(JobShopNode root, int& total_node, int& C_max)
 	printf("total run node %d\n", count);
 	printf("removed node   %d(%d)\n", _removed_node, _w_removed_node);
 	printf("removed node   %d(%d) (algorithm 2 step 1.2 E or S reduce, proposition 4, 5, 8, 9)\n", _removed_node7, _w_removed_node7);
+	printf("removed node   %d(%d) (algorithm 2 step 1.2 E reduce, proposition 4)\n", _removed_node_E_empty_prop_4, _w_removed_node_E_empty_prop_4);
+	printf("removed node   %d(%d) (algorithm 2 step 1.2 E reduce, proposition 5)\n", _removed_node_E_empty_prop_5, _w_removed_node_E_empty_prop_5);
+	printf("removed node   %d(%d) (algorithm 2 step 1.2 E reduce, proposition 7)\n", _removed_node_E_empty_prop_7, _w_removed_node_E_empty_prop_7);
+	printf("removed node   %d(%d) (algorithm 2 step 1.2 E reduce, proposition 9)\n", _removed_node_E_empty_prop_9, _w_removed_node_E_empty_prop_9);
+	printf("removed node   %d(%d) (algorithm 2 step 1.2 S reduce, proposition 4)\n", _removed_node_S_empty_prop_4, _w_removed_node_S_empty_prop_4);
+	printf("removed node   %d(%d) (algorithm 2 step 1.2 S reduce, proposition 5)\n", _removed_node_S_empty_prop_5, _w_removed_node_S_empty_prop_5);
+	printf("removed node   %d(%d) (algorithm 2 step 1.2 S reduce, proposition 7)\n", _removed_node_S_empty_prop_7, _w_removed_node_S_empty_prop_7);
+	printf("removed node   %d(%d) (algorithm 2 step 1.2 S reduce, proposition 8)\n", _removed_node_S_empty_prop_8, _w_removed_node_S_empty_prop_8);
 	printf("removed node   %d(%d) (algorithm 2 step 1.2 E or S empty, proposition 4, 5, 8, 9)\n", _removed_node1, _w_removed_node1);
 	printf("removed node   %d(%d) (algorithm 2 step 1.3 E or S empty, propositoin 13)\n", _removed_node2, _w_removed_node2);
 	printf("removed node     %d(%d) (algorithm 2 step 1.3 E or S empty: fix input eq 4, 5, 8, 9, 10, 11 prop 1)\n", _removed_node2_fix_input, _w_removed_node2_fix_input);
@@ -88,8 +97,9 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 		{
 			size_t size_all = 0;
 			size_t size_alg = 0;
+			std::set<std::pair<size_t, size_t>> v;
 			{
-				std::set<std::pair<size_t, size_t>> set;
+				std::set<std::pair<size_t, size_t>> set_all;
 				for (size_t i : node.C())
 				{
 					for (size_t j : node.C())
@@ -98,13 +108,11 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 						{
 							continue;
 						}
-						set.insert(std::make_pair(i, j));
+						set_all.insert(std::make_pair(i, j));
 					}
 				}
-				size_all = set.size();
-			}
-            {
-				std::set<std::pair<size_t, size_t>> set;
+				size_all = set_all.size();
+				std::set<std::pair<size_t, size_t>> set_alg;
 				for (size_t i : node.E())
 				{
 					for (size_t j : node.S())
@@ -113,10 +121,11 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 						{
 							continue;
 						}
-						set.insert(std::make_pair(i, j));
+						set_alg.insert(std::make_pair(i, j));
 					}
 				}
-				size_alg = set.size();
+				size_alg = set_alg.size();
+				std::set_difference(set_all.begin(), set_all.end(), set_alg.begin(), set_alg.end(), std::inserter(v, v.begin()));
 			}
 			if (size_alg > size_all)
 			{
@@ -126,12 +135,52 @@ void BranchBoundAlgorithm::_run(JobShopNode node, JobShopNode& best, int& UB)
 			_removed_node7 += size_all - size_alg;
 			_w_removed_node += (size_all - size_alg) * node.get_permutation_count(2);
 			_w_removed_node7 += (size_all - size_alg) * node.get_permutation_count(2);
+			int permutation_count = node.get_permutation_count(2);
+			if (!v.empty())
+			{
+				for (const std::pair<size_t, size_t>& p : v)
+				{
+					if (node.E().find(p.first) == node.E().end())
+					{
+						if (!node.is_proposition_4_input(p.first))
+						{
+							++_removed_node_E_empty_prop_4;
+							_w_removed_node_E_empty_prop_4 += permutation_count;
+						}
+						if (!node.is_proposition_7(p.first, UB))
+						{
+							++_removed_node_E_empty_prop_7;
+							_w_removed_node_E_empty_prop_7 += permutation_count;
+						}
+					    ++_removed_node_E_empty_prop_5;
+					    ++_removed_node_E_empty_prop_9;
+				    	_w_removed_node_E_empty_prop_5 += permutation_count;
+				    	_w_removed_node_E_empty_prop_9 += permutation_count;
+					}
+					if (node.S().find(p.second) == node.S().end())
+					{
+						if (!node.is_proposition_4_input(p.second))
+						{
+							++_removed_node_S_empty_prop_4;
+							_w_removed_node_S_empty_prop_4 += permutation_count;
+						}
+						if (!node.is_proposition_7(p.second, UB))
+						{
+							++_removed_node_S_empty_prop_7;
+							_w_removed_node_S_empty_prop_7 += permutation_count;
+						}
+					    ++_removed_node_S_empty_prop_5;
+					    ++_removed_node_S_empty_prop_8;
+				    	_w_removed_node_S_empty_prop_5 += permutation_count;
+				    	_w_removed_node_S_empty_prop_8 += permutation_count;
+					}
+				}
+			}
 		}
 		if(node.E().empty() || node.S().empty())
 		{
 			// remove node
 			// go to step 3
-			//printf("%s %d, E or S is empty, remove node, go to step 3\n", __func__, __LINE__);
 			++_removed_node;
 			++_removed_node1;
 			_w_removed_node += node.get_permutation_count();

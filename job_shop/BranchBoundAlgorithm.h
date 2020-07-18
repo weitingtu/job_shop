@@ -18,6 +18,14 @@ public:
 		_removed_node5(0),
 		_removed_node6(0),
 		_removed_node7(0),
+	    _removed_node_E_empty_prop_4(0),
+	    _removed_node_E_empty_prop_5(0),
+	    _removed_node_E_empty_prop_7(0),
+    	_removed_node_E_empty_prop_9(0),
+	    _removed_node_S_empty_prop_4(0),
+	    _removed_node_S_empty_prop_5(0),
+	    _removed_node_S_empty_prop_7(0),
+	    _removed_node_S_empty_prop_8(0),
 		_w_removed_node(0),
 		_w_removed_node1(0),
 		_w_removed_node2(0),
@@ -27,7 +35,15 @@ public:
 		_w_removed_node4(0),
 		_w_removed_node5(0),
 		_w_removed_node6(0),
-		_w_removed_node7(0)
+		_w_removed_node7(0),
+	    _w_removed_node_E_empty_prop_4(0),
+	    _w_removed_node_E_empty_prop_5(0),
+	    _w_removed_node_E_empty_prop_7(0),
+    	_w_removed_node_E_empty_prop_9(0),
+	    _w_removed_node_S_empty_prop_4(0),
+	    _w_removed_node_S_empty_prop_5(0),
+	    _w_removed_node_S_empty_prop_7(0),
+	    _w_removed_node_S_empty_prop_8(0)
 	{}
 
 	void run(JobShopNode root, int& total_node, int& C_max);
@@ -50,6 +66,14 @@ private:
 	int _removed_node5;
 	int _removed_node6;
 	int _removed_node7;
+	int _removed_node_E_empty_prop_4;
+	int _removed_node_E_empty_prop_5;
+	int _removed_node_E_empty_prop_7;
+	int _removed_node_E_empty_prop_9;
+	int _removed_node_S_empty_prop_4;
+	int _removed_node_S_empty_prop_5;
+	int _removed_node_S_empty_prop_7;
+	int _removed_node_S_empty_prop_8;
 	int _w_removed_node;
 	int _w_removed_node1;
 	int _w_removed_node2;
@@ -60,6 +84,14 @@ private:
 	int _w_removed_node5;
 	int _w_removed_node6;
 	int _w_removed_node7;
+	int _w_removed_node_E_empty_prop_4;
+	int _w_removed_node_E_empty_prop_5;
+	int _w_removed_node_E_empty_prop_7;
+	int _w_removed_node_E_empty_prop_9;
+	int _w_removed_node_S_empty_prop_4;
+	int _w_removed_node_S_empty_prop_5;
+	int _w_removed_node_S_empty_prop_7;
+	int _w_removed_node_S_empty_prop_8;
 };
 
 class Permutation

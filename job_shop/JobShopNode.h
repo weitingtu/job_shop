@@ -63,6 +63,9 @@ public:
 	{
 		return _LB > rhs._LB;
 	}
+	bool is_proposition_4_input(size_t k) const;
+	bool is_proposition_4_output(size_t ryy) const;
+	bool is_proposition_7(size_t k, int UB) const;
 private:
 	struct Job {
 		Job(size_t i, int rr, int pp, int qq);
@@ -97,11 +100,8 @@ private:
 	int get_LB(const std::set<size_t>& C) const;
 	int get_LB_ATSP(const std::set<size_t>& C) const;
 	int _proposition_1() const;
-	bool is_proposition_4_input(size_t k) const;
-	bool is_proposition_4_output(size_t ryy) const;
 	bool is_proposition_5_a(size_t k, int UB) const;
 	bool is_proposition_5_b(size_t idx_r, int UB) const;
-	bool is_proposition_7(size_t k, int UB) const;
 	void proposition_11(int UB);
 
 	bool has_arc(size_t i, size_t j) const;
